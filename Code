@@ -1,0 +1,78 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+#define MQ_SENSOR 34
+
+float sensorValue;
+float voltage;
+float ppm;
+
+void setup() {
+
+  Serial.begin(115200);
+
+  pinMode(MQ_SENSOR, INPUT);
+
+  Wire.begin(21, 22);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED Failed");
+    while(true);
+  }
+
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+
+}
+
+void loop() {
+
+  sensorValue = analogRead(MQ_SENSOR);
+
+  voltage = sensorValue * (3.3 / 4095.0);
+
+  // Approximate ammonia ppm mapping
+  ppm = map(sensorValue, 0, 4095, 0, 20);
+
+  Serial.print("PPM: ");
+  Serial.println(ppm);
+
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setCursor(0,0);
+  display.println("CKD Screening Kit");
+
+  display.setCursor(0,20);
+  display.print("Ammonia: ");
+  display.print(ppm);
+  display.println(" ppm");
+
+  display.setCursor(0,40);
+
+  if(ppm <= 5) {
+
+    display.println("Status: NORMAL");
+
+  }
+  else if(ppm > 5 && ppm <= 12) {
+
+    display.println("Status: MODERATE");
+
+  }
+  else {
+
+    display.println("Status: HIGH RISK");
+
+  }
+
+  display.display();
+
+  delay(2000);
+}
