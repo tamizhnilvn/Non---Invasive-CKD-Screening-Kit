@@ -1,0 +1,11 @@
+1. MQ Sensor → ESP32
+VCC -	5V
+GND -	GND
+AO - GPIO34
+DO - Not Connected
+
+2. OLED Display (I2C) → ESP32
+VCC - 3.3V
+GND -	GND
+SCL -	GPIO22
+SDA -	GPIO21
